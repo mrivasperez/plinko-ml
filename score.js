@@ -1,38 +1,38 @@
-// const outputs = [];
+const outputs = [];
+const kPoint = 3;
+const predictionDroppoint = 300;
 
 function onScoreUpdate(dropPosition, bounciness, size, bucketLabel) {
-  // Ran every time a balls drops into a bucket
   outputs.push([dropPosition, bounciness, size, bucketLabel]);
-  console.log(outputs);
 }
 
 function runAnalysis() {
-  // Write code here to analyze stuff
+  // MAKE PREDICTION
+  // map through the results to create a new array: [dropPoint, bucket][]
+  // sort the array by distance from prediction droppoint
+  // slice the sorted array up to the kPoint (nearest neighbors to consider)
+  // count to identify the most common bucket
+  // pair the key values as an array of arrays to use data easier [bucket, count]
+  // sort by count so that the most recorded bucket is last
+  // get the last array element
+  // get the first element of that array to get prediction
+
+  const bucket = _.chain(outputs)
+    .map((result) => [distanceFromPredictionDroppoint(result[0]), result[3]])
+    .sortBy((row) => row[0])
+    .slice(0, kPoint)
+    .countBy((row) => row[1])
+    .toPairs()
+    .sortBy((row) => row[1])
+    .last()
+    .first()
+    .parseInt()
+    .value();
+
+  console.log(`I predict your ball will fall into ${bucket}`);
 }
-
-// [drop point, bounciness, size, bucketLable][]
-const outputs = [
-  [10, 0.5, 16, 1],
-  [200, 0.5, 16, 4],
-  [350, 0.5, 16, 4],
-  [600, 0.5, 16, 5]
-];
-
-// the drop point one is predicting for
-const predictionDroppoint = 300;
-
-// the k value - how many "neighbors" will be checked
-const kPoint = 3;
 
 // calculate the distance from the droppoint to the 'predictionDroppoint'
 const distanceFromPredictionDroppoint = (point) => {
   return Math.abs(point - predictionDroppoint);
 };
-
-_.chain(outputs)
-  // map through the results to create a new array: [dropPoint, bucket][]
-  .map((result) => [distanceFromPredictionDroppoint(result[0], result[3])])
-  // sort the array by distance from prediction droppoint
-  .sortBy((row) => row[0])
-  // slice the sorted array up to the kPoint (nearest neighbors to consider)
-  .slice(0, kPoint);
